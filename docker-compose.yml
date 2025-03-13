@@ -21,7 +21,11 @@ services:
       - db
 
   db:
-    image: mysql:${MYSQL_VERSION}
+    build:
+      context: .
+      dockerfile: mysql/Dockerfile
+      args:
+        MYSQL_VERSION: ${MYSQL_VERSION}
     platform: linux/amd64
     container_name: ezhpo-mysql
     ports:
