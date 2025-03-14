@@ -35,7 +35,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - db_data:/var/lib/mysql
+      - db-data:/var/lib/mysql
     networks:
       - ezhpo-network
 
@@ -44,4 +44,4 @@ networks:
     driver: bridge
 
 volumes:
-  db_data:
+  db-data:

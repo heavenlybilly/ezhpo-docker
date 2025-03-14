@@ -1,10 +1,7 @@
-DOCKER_COMPOSE = docker compose
+DOCKER_COMPOSE = docker-compose -f docker-compose.yml
 
 build:
 	$(DOCKER_COMPOSE) build --no-cache
-
-ps:
-	$(DOCKER_COMPOSE) ps
 
 down:
 	$(DOCKER_COMPOSE) down
@@ -19,7 +16,7 @@ bash:
 	$(DOCKER_COMPOSE) exec -it php-apache bash
 
 db:
-	$(DOCKER_COMPOSE) exec -it -u root db bash
+	$(DOCKER_COMPOSE) exec -it db bash
 
 enable:
 	@read -p "Enter host name: " HOST_NAME && \
@@ -31,8 +28,13 @@ import-db:
 	echo "⚠️  Внимание: если база данных '$$DB_NAME' существует — она будет удалена и создана заново!" && \
 	read -p "Продолжить? (нажмите любую клавишу, чтобы продолжить, 'n' — чтобы отменить): " CONFIRM && \
 	read -e -p "Введите путь к SQL-дампу (на хосте): " && \
+	gunzip -c $$REPLY > dump.sql && \
 	$(DOCKER_COMPOSE) cp .env db:/tmp/.env && \
-	$(DOCKER_COMPOSE) cp import.sh db:/tmp/import.sh && \
-	$(DOCKER_COMPOSE) cp $$REPLY db:/tmp/dump.sql.gz && \
-	$(DOCKER_COMPOSE) exec -T db chmod +x /tmp/import.sh && \
-	$(DOCKER_COMPOSE) exec -T -w /tmp db bash -c "./import.sh $$DB_NAME dump.sql.gz"
+	$(DOCKER_COMPOSE) cp pre.sh db:/tmp/pre.sh && \
+	$(DOCKER_COMPOSE) cp post.sh db:/tmp/post.sh && \
+	$(DOCKER_COMPOSE) exec -T db chmod +x /tmp/pre.sh && \
+	$(DOCKER_COMPOSE) exec -T db chmod +x /tmp/post.sh && \
+	$(DOCKER_COMPOSE) exec -T -w /tmp db bash -c "./pre.sh $$DB_NAME" && \
+	echo "🔵 Импорт БД из дампа" && \
+	pv dump.sql | $(DOCKER_COMPOSE) exec -T db mysql -u root -proot $$DB_NAME && \
+	$(DOCKER_COMPOSE) exec -T -w /tmp db bash -c "./post.sh $$DB_NAME"
