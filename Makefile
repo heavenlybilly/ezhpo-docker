@@ -19,7 +19,7 @@ bash:
 	$(DOCKER_COMPOSE) exec -it php-apache bash
 
 db:
-	$(DOCKER_COMPOSE) exec -it -u root db bash
+	$(DOCKER_COMPOSE) exec -it -u root mysql bash
 
 enable:
 	@read -p "Enter host name: " HOST_NAME && \
@@ -31,8 +31,7 @@ import-db:
 	echo "⚠️  Внимание: если база данных '$$DB_NAME' существует — она будет удалена и создана заново!" && \
 	read -p "Продолжить? (нажмите любую клавишу, чтобы продолжить, 'n' — чтобы отменить): " CONFIRM && \
 	read -e -p "Введите путь к SQL-дампу (на хосте): " && \
-	$(DOCKER_COMPOSE) cp .env db:/tmp/.env && \
-	$(DOCKER_COMPOSE) cp import.sh db:/tmp/import.sh && \
-	$(DOCKER_COMPOSE) cp $$REPLY db:/tmp/dump.sql.gz && \
-	$(DOCKER_COMPOSE) exec -T db chmod +x /tmp/import.sh && \
-	$(DOCKER_COMPOSE) exec -T -w /tmp db bash -c "./import.sh $$DB_NAME dump.sql.gz"
+	$(DOCKER_COMPOSE) cp import.sh mysql:/tmp/import.sh && \
+	$(DOCKER_COMPOSE) cp $$REPLY mysql:/tmp/dump.sql.gz && \
+	$(DOCKER_COMPOSE) exec -T mysql chmod +x /tmp/import.sh && \
+	$(DOCKER_COMPOSE) exec -T -w /tmp mysql bash -c "./import.sh $$DB_NAME dump.sql.gz"

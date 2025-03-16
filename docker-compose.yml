@@ -16,17 +16,16 @@ services:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
     networks:
-      - ezhpo-network
+      - backend
     depends_on:
-      - db
+      - mysql
 
-  db:
+  mysql:
+    platform: linux/amd64
     build:
-      context: .
-      dockerfile: mysql/Dockerfile
+      context: ./mysql
       args:
         MYSQL_VERSION: ${MYSQL_VERSION}
-    platform: linux/amd64
     container_name: ezhpo-mysql
     ports:
       - "${MYSQL_PORT}:3306"
@@ -36,11 +35,12 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
+      - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
     networks:
-      - ezhpo-network
+      - backend
 
 networks:
-  ezhpo-network:
+  backend:
     driver: bridge
 
 volumes:
