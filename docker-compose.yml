@@ -10,7 +10,7 @@ services:
     ports:
       - "${APP_PORT}:80"
     volumes:
-      - ${PROJECTS_ROOT}:/var/www
+      - ../ezhpo/:/var/www/ezhpo
       - ${APP_VHOST_DIR}:/etc/apache2/sites-available
     environment:
       - APACHE_RUN_USER=www-data

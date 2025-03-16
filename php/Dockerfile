@@ -24,4 +24,4 @@ ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 
-WORKDIR /var/www
+WORKDIR /var/www/ezhpo
