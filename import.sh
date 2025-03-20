@@ -8,10 +8,12 @@ if [[ -z "$DB_NAME" || -z $DUMP_NAME ]]; then
     exit 1
 fi
 
+ls -la
+
 echo -e "\n🔵 Извлечение дампа из архива"
-#rm -f dump.sql
-#gunzip -c "$DUMP_NAME" > dump.sql
-rm -f "$DUMP_NAME"
+rm -f dump.sql
+gunzip -c "./$DUMP_NAME" > dump.sql
+rm -rf "$DUMP_NAME"
 
 echo -e "\n🔵 Удаление старой БД (если существует)"
 mysql -u root -proot -e "drop database if exists \`$DB_NAME\`;"
@@ -37,4 +39,5 @@ set autocommit=1;
 
 echo -e "\n✅ Импорт данных в базу данных $DB_NAME завершен"
 
-#rm -f dump.sql
+rm -f dump.sql
+rm -- "$0"

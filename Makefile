@@ -31,7 +31,8 @@ import-db:
 	echo "⚠️  Внимание: если база данных '$$DB_NAME' существует — она будет удалена и создана заново!" && \
 	read -p "Продолжить? (нажмите любую клавишу, чтобы продолжить, 'n' — чтобы отменить): " CONFIRM && \
 	read -e -p "Введите путь к SQL-дампу (на хосте): " && \
-	$(DOCKER_COMPOSE) cp import.sh mysql:/tmp/import.sh && \
+	echo $$REPLY && \
+	$(DOCKER_COMPOSE) cp import.sh mysql:/tmp/ && \
 	$(DOCKER_COMPOSE) cp $$REPLY mysql:/tmp/dump.sql.gz && \
-	$(DOCKER_COMPOSE) exec -T mysql chmod +x /tmp/import.sh && \
+	$(DOCKER_COMPOSE) exec -T mysql chmod +x /tmp/ && \
 	$(DOCKER_COMPOSE) exec -T -w /tmp mysql bash -c "./import.sh $$DB_NAME dump.sql.gz"
