@@ -8,8 +8,6 @@ if [[ -z "$DB_NAME" || -z $DUMP_NAME ]]; then
     exit 1
 fi
 
-ls -la
-
 echo -e "\n🔵 Извлечение дампа из архива"
 rm -f dump.sql
 gunzip -c "./$DUMP_NAME" > dump.sql
