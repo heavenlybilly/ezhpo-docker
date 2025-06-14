@@ -1,0 +1,65 @@
+version: "3"
+
+vars:
+  DOCKER_COMPOSE: docker compose
+
+dotenv: ['.env']
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  build:
+    desc: "Build Docker images without using cache"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} build --no-cache"
+
+  down:
+    desc: "Stop and remove containers, networks, and volumes"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} down"
+
+  ps:
+    desc: "Show the status of running containers"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} ps"
+
+  stop:
+    desc: "Stop all running containers without removing them"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} stop"
+
+  up:
+    desc: "Start all containers in the foreground"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} up -d"
+
+  restart:
+    desc: "Restart all containers (stop + up)"
+    cmds:
+      - task stop
+      - task up
+
+  logs:
+    desc: "Display logs for all services"
+    cmds:
+      - "{{.DOCKER_COMPOSE}} logs -f"
+  
+  php:cli:
+    desc: "Open a shell session inside the php-apache container"
+    cmds:
+      - task up
+      - "{{.DOCKER_COMPOSE}} exec -it php-apache bash"
+
+  db:cli:
+    desc: "Open MySQL CLI inside the MySQL container using credentials from .env"
+    cmds:
+      - task up
+      - '{{.DOCKER_COMPOSE}} exec -it mysql mysql -u root -p{{.MYSQL_ROOT_PASSWORD}}'
+
+  db:import:
+    desc: "Import SQL dump into a new database (WARNING: will drop existing database if a database with the specified name already exists)"
+    cmds:
+      - bash ./scripts/import-db.sh
