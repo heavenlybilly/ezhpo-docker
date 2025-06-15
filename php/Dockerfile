@@ -15,20 +15,6 @@ RUN a2enmod rewrite \
     && a2dissite 000-default.conf \
     && a2ensite ezhpo.conf
 
-# Install NodeJs and NPM
-ENV NVM_DIR=/root/.nvm
-ARG NODE_VERSION
-ENV NODE_VERSION=${NODE_VERSION}
-
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
-    . "$NVM_DIR/nvm.sh" && \
-    nvm install $NODE_VERSION && \
-    nvm use $NODE_VERSION && \
-    nvm alias default $NODE_VERSION && \
-    echo "source $NVM_DIR/nvm.sh" >> /root/.bashrc
-
-ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
@@ -58,5 +44,20 @@ RUN echo 'export LANG=ru_RU.UTF-8' >> /home/app/.bashrc \
     && echo 'export LC_ALL=ru_RU.UTF-8' >> /home/app/.bashrc
 
 USER app
+
+# Install NodeJs and NPM
+ENV NVM_DIR=/home/app/.nvm
+ARG NODE_VERSION
+ENV NODE_VERSION=${NODE_VERSION}
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    . "$NVM_DIR/nvm.sh" && \
+    nvm install $NODE_VERSION && \
+    nvm use $NODE_VERSION && \
+    nvm alias default $NODE_VERSION && \
+    echo "export NVM_DIR=$NVM_DIR" >> /home/app/.bashrc && \
+    echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> /home/app/.bashrc
+
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 WORKDIR /var/www/ezhpo
