@@ -1,4 +1,20 @@
 services:
+  traefik:
+    image: traefik:v3.5
+    container_name: ezhpo-traefik
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--api.insecure=true" 
+      - "--api.dashboard=true" 
+    ports:
+      - "80:80" 
+      - "8080:8080" 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - backend
+
   php-apache:
     build:
       context: .
@@ -10,8 +26,10 @@ services:
         UID: ${UID}
         GID: ${GID}
     container_name: ezhpo-php
-    ports:
-      - "${APP_PORT}:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ezhpo.rule=Host(`ezhpo.localhost`)"
+      - "traefik.http.routers.ezhpo.entrypoints=web"
     volumes:
       - ${PROJECT_DIR}:/var/www/ezhpo
     environment:
